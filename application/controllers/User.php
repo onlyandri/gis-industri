@@ -234,4 +234,11 @@ class User extends CI_Controller
             redirect('user/Industri');
         }
     }
+
+    public function viewmarker(){
+
+        $data = $this->db->query("SELECT * FROM desa")->result();
+
+        echo json_encode($data);
+    }
 }

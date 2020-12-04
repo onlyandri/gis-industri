@@ -103,60 +103,103 @@ use function PHPSTORM_META\type;
         map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
         // Add a listener for the click event
-        google.maps.event.addListener(map, 'click', addLatLng); //ambil koordinat dengan klik kanan
-        google.maps.event.addListener(map, "click", function(event) { //saat klik kanan mengambil data koordinat latitude dan longitude
-            var lat = event.latLng.lat();
-            var lng = event.latLng.lng();
-            $('#latitude').val(lat);
-            $('#longitude').val(lng);
-            //alert(lat +" dan "+lng);
+        // google.maps.event.addListener(map, 'click', addLatLng); //ambil koordinat dengan klik kanan
+        // google.maps.event.addListener(map, "click", function(event) { //saat klik kanan mengambil data koordinat latitude dan longitude
+        //     var lat = event.latLng.lat();
+        //     var lng = event.latLng.lng();
+        //     $('#latitude').val(lat);
+        //     $('#longitude').val(lng);
+        //     //alert(lat +" dan "+lng);
+        // });
+
+        $.getJSON("<?= base_url()?>user/viewmarker", function(data){
+            $.each(data, function(k, v){
+                var pos = {
+                    lat : parseFloat(v.latitude),
+                    lng : parseFloat(v.longitude)
+                };
+                var contentString = '<h5 align="center">'  + v.nama_desa + '</h5>' + 
+                '<p align="center">'+v.id_desa+'</p>';
+                var infowindow = new google.maps.InfoWindow({
+                    content: contentString
+                });
+                var marker = new google.maps.Marker({
+                    position: pos,
+                    map: map,
+                    animation: google.maps.Animation.BOUNCE,
+                    icon: '<?php echo base_url('assets/img/icons/2.png') ?>'
+                });         
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });    
         });
+
     }
 
 
-    function addLatLng(event) {
-        var marker = new google.maps.Marker({
-            position: event.latLng,
-            title: 'Simple GIS',
-            map: map
-        });
-        markers.push(marker);
-    }
+    // function addLatLng(event) {
+    //     var marker = new google.maps.Marker({
+    //         position: event.latLng,
+    //         title: 'Simple GIS',
+    //         map: map
+    //     });
+    //     markers.push(marker);
+    // }
     google.maps.event.addDomListener(window, 'load', initialize); //load function initialize diatas
 
 
-    function viewmarker(e) {
-        e.preventDefault();
-        var datakoordinat = {
-            'id_industri': $(this).data('iddatajembatan')
-        };
-        $.ajax({
-            url: '<?php echo site_url("user/viewmarker") ?>',
-            data: datakoordinat,
-            dataType: 'json',
-            type: 'POST',
-            success: function(data, status) {
-                if (data.status != 'error') {
-                    clearmap(e);
-                    //load marker
-                    $.each(data.msg, function(m, n) {
-                        var myLatLng = {
-                            lat: parseFloat(n["latitude"]),
-                            lng: parseFloat(n["longitude"])
-                        };
-                        console.log(m, n);
-                        $.each(data.datajembatan, function(k, v) {
-                            addMarker(v['nama_pemilik'], myLatLng);
-                        })
-                        return false;
-                    })
-                    //end load marker
-                } else {
-                    alert(data.msg);
-                }
-            }
-        })
-    }
+    // function viewmarker(e) {
+
+
+    //     $.getJSON("<?= base_url()?>user/viewmarker", function(data){
+    //         $.each(data, function(i, field){
+
+    //              var myLatLng = {
+    //                         lat: parseFloat(data[i].longitude),
+    //                         lng: parseFloat(data[i].latitude)
+    //                     };
+
+    //                      addMarker(v['nama_pemilik'], myLatLng);
+
+    //                  })
+    //     })
+    // }
+
+    //             var v_lat = parseFloat(data[i].longitude);
+    //             var v_long = parseFloat(data[i].latitude);
+
+    //     e.preventDefault();
+    //     var datakoordinat = {
+    //         'id_industri': $(this).data('iddatajembatan')
+    //     };
+    //     $.ajax({
+    //         url: '<?php echo base_url("user/viewmarker") ?>',
+    //         data: datakoordinat,
+    //         dataType: 'json',
+    //         type: 'POST',
+    //         success: function(data, status) {
+    //             if (data.status != 'error') {
+    //                 clearmap(e);
+    //                 //load marker
+    //                 $.each(data.msg, function(m, n) {
+    //                     var myLatLng = {
+    //                         lat: parseFloat(n["latitude"]),
+    //                         lng: parseFloat(n["longitude"])
+    //                     };
+    //                     console.log(m, n);
+    //                     $.each(data.datajembatan, function(k, v) {
+    //                         addMarker(v['nama_pemilik'], myLatLng);
+    //                     })
+    //                     return false;
+    //                 })
+    //                 //end load marker
+    //             } else {
+    //                 alert(data.msg);
+    //             }
+    //         }
+    //     })
+    // }
 
     // function clearmap() {
     //     e.preventDefault(); // dikomen aja
